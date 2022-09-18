@@ -7,7 +7,6 @@
 <%@ page import = "com.oreilly.servlet.MultipartRequest" %>
 <%@ page import="com.board.boardjsp.*" %>
 <%@ page import="java.io.File" %>
-
 <%
     String uploadPath = "C:/boardFile";		// 업로드 경로
     int maxFileSize = 1024 * 1024 * 20;	// 업로드 제한 용량 = 20MB
@@ -55,6 +54,7 @@
                 long filesize=file.length();
 
                 boardDAO.fileInfo(ofileName, fileName, filesize);
+                boardDAO.boardFileState();
             }//if end
         }//if end
         idx++;

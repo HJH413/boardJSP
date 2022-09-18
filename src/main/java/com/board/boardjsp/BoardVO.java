@@ -11,11 +11,20 @@ public class BoardVO {
     String board_content;
     String board_date;
     String board_update;
+    int board_file_state;
     int board_count; //조회수
     int board_search_count; //검색 건수
     int category_num;
     String category_name;
     String file_name;
+
+    public int getBoard_file_state() {
+        return board_file_state;
+    }
+
+    public void setBoard_file_state(int board_file_state) {
+        this.board_file_state = board_file_state;
+    }
 
     public int getBoard_num() {
         return board_num;
