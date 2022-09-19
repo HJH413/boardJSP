@@ -1,5 +1,6 @@
 package com.board.boardjsp;
 
+import javax.servlet.http.HttpSession;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -207,6 +208,27 @@ public class BoardDAO {
         }
         return boardVO;
     }
+    //조회수 증가
+    public void boardCount(int boardNum){
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        String sql = "UPDATE board SET board_count = IFNULL(board_count, 0) + 1 WHERE board_num = ?";
+        try {
+            connection = this.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1,boardNum);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            this.close(connection, statement, null);
+        }
+
+    }
+
+
+    //파일목록
     public List<BoardVO> fileList(int boardNum){
         List<BoardVO> fileList = new ArrayList<>();
         Connection connection = null;
@@ -234,6 +256,57 @@ public class BoardDAO {
         return fileList;
     }
     //댓글작성
+    public void boardCommentsWrite(BoardVO boardVO){
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        String sql = "INSERT INTO comments (board_num,comments_writer, comments_content) values (?, ?, ?)";
+
+        try {
+            connection = this.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1,boardVO.getBoard_num());
+            statement.setString(2,boardVO.getComment_writer());
+            statement.setString(3,boardVO.getComment_content());
+            statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            this.close(connection, statement, null);
+        }
+    }
+    //댓글 리스트
+    public List<BoardVO> boardCommentsList(int boardNum){
+        List<BoardVO> commnetsList = new ArrayList<>();
+
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+
+        String sql = "SELECT comments_num, comments_writer, comments_content, comments_time, board_num FROM comments WHERE board_num = ? ORDER BY comments_time";
+
+        try {
+            connection = this.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1,boardNum);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                BoardVO boardVO = new BoardVO();
+                boardVO.setComment_writer(resultSet.getString("comments_writer"));
+                boardVO.setComment_content(resultSet.getString("comments_content"));
+                String ymd = String.valueOf(resultSet.getDate("comments_time"));
+                String hms = String.valueOf(resultSet.getTime("comments_time"));
+                boardVO.setComment_date(ymd + " " + hms);
+                commnetsList.add(boardVO);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            this.close(connection, statement, resultSet);
+        }
+
+        return commnetsList;
+    }
     //글수정
 
     //글삭제

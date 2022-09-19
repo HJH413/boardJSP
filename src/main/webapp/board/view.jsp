@@ -4,9 +4,12 @@
 <%@ page import="java.util.*" %>
 <%@ page import="com.board.boardjsp.*" %>
 <%
-    int boardNum = Integer.parseInt(request.getParameter("boardNum"));
     BoardDAO boardDAO = new BoardDAO();
     BoardVO boardVO = new BoardVO();
+    int boardNum = Integer.parseInt(request.getParameter("boardNum"));
+
+    boardDAO.boardCount(boardNum);
+
     boardVO = boardDAO.boardRead(boardNum);
     List<BoardVO> filelist = boardDAO.fileList(boardNum);
     String boardWriter = boardVO.getBoard_writer();
@@ -16,6 +19,8 @@
     int boardCount = boardVO.getBoard_count();
     String boardContent = boardVO.getBoard_content();
     String categoryName = boardVO.getCategory_name();
+
+    List<BoardVO> boardCommentsList = boardDAO.boardCommentsList(boardNum);
 %>
 <html>
 <head>
@@ -37,13 +42,6 @@
 <hr/>
 <textarea rows="10" cols="150" minlength="4" maxlength="1999" readonly><%=boardContent%></textarea>
 <hr/>
-
-<hr/>
-<form>
-    <textarea rows="3" cols="150" minlength="4" maxlength="1999"></textarea>
-    <br/>
-    <input type="submit" value="등록">
-</form>
 <%
     for (BoardVO boardVO1 : filelist){
 %>
@@ -51,9 +49,30 @@
 <%
     }
 %>
-
 <hr/>
 <br/>
+<% if(boardCommentsList == null) { %>
+    댓글이 출력됩니다.
+<% } else { %>
+    <%
+        for (BoardVO comments : boardCommentsList){
+    %>
+    작성자 : <%=comments.getComment_writer()%>       <%=comments.getComment_date()%>
+    <br/>
+    <%=comments.getComment_content()%>
+    <hr/>
+    <%
+        }
+    %>
+<% } %>
+<form action="/board/comments_save.jsp" method="post">
+    <input type="hidden" name="board_num" value="<%=boardNum %>">
+    댓글 작성자 : <input type="text" name="comments_writer" minlength="1" maxlength="5" required/>
+    <textarea rows="3" cols="150" name="comments_content" minlength="1" maxlength="200" placeholder="댓글을 입력해 주세요." required></textarea>
+    <br/>
+    <input type="submit" value="등록">
+</form>
+<hr/>
 <a href="/board/list.jsp"><button>목록</button></a><a><button>수정</button></a><a><button>삭제</button></a>
 </body>
 </html>

@@ -18,6 +18,34 @@ public class BoardVO {
     String category_name;
     String file_name;
 
+    String comment_writer;
+    String comment_content;
+    String comment_date;
+
+    public String getComment_date() {
+        return comment_date;
+    }
+
+    public void setComment_date(String comment_date) {
+        this.comment_date = comment_date;
+    }
+
+    public String getComment_writer() {
+        return comment_writer;
+    }
+
+    public void setComment_writer(String comment_writer) {
+        this.comment_writer = comment_writer;
+    }
+
+    public String getComment_content() {
+        return comment_content;
+    }
+
+    public void setComment_content(String comment_content) {
+        this.comment_content = comment_content;
+    }
+
     public int getBoard_file_state() {
         return board_file_state;
     }
