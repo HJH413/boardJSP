@@ -21,6 +21,7 @@ public class BoardVO {
     String comment_writer;
     String comment_content;
     String comment_date;
+    int comment_count; //게시글 당 댓글 개수 페이징
 
     public String getComment_date() {
         return comment_date;

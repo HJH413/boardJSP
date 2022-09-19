@@ -307,10 +307,52 @@ public class BoardDAO {
 
         return commnetsList;
     }
+    //댓글 카운트
+    public int boardCommentsCount(int boardNum){
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        String sql = "SELECT count(1) as comments_count FROM comments WHERE board_num = ?";
+        int boardCommentsCount = 0;
+        try {
+            connection = this.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1,boardNum);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                boardCommentsCount = resultSet.getInt("comments_count");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            this.close(connection, statement, resultSet);
+        }
+        return boardCommentsCount;
+    }
     //글수정
 
     //글삭제
+    public int boardDelete(int boardNum){
 
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+
+        String sql = "";
+
+        try {
+            connection = this.getConnection();
+            statement = connection.prepareStatement(sql);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            this.close(connection, statement, resultSet);
+        }
+
+
+        return 1;
+    }
 
     //커넥션
     private Connection getConnection() {
