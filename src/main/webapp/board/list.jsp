@@ -26,16 +26,50 @@
     int startRow = (currentPage-1) * pageSize + 1;
 
     BoardDAO boardDAO = new BoardDAO();
-    List<BoardVO> list = boardDAO.boardList(startRow, pageSize);
+    BoardSearchVO boardSearchVO = new BoardSearchVO();
+    String startDate = "";
+    String endDate = "";
+    int categoryNum = 0;
+    String searchText = "";
+
+    if (request.getParameter("board_date_start") == null){
+        startDate = "1999-01-01";
+    } else {
+        startDate = request.getParameter("board_date_start");
+    }
+    if (request.getParameter("board_date_end") == null){
+        endDate = "2999-01-01";
+    } else {
+        endDate = request.getParameter("board_date_end");
+    }
+    if (request.getParameter("category_num") == null){
+        categoryNum = 0;
+    } else {
+        categoryNum = Integer.parseInt(request.getParameter("category_num"));
+    }
+    if (request.getParameter("board_search_text") == null){
+        searchText = "";
+    } else {
+        searchText = request.getParameter("board_search_text");
+    }
+
+    boardSearchVO.setStartDate(startDate);
+    boardSearchVO.setEndDate(endDate);
+    boardSearchVO.setCategoryNum(categoryNum);
+    boardSearchVO.setSearchText(searchText);
+
+    List<BoardVO> list = boardDAO.boardList(startRow, pageSize, boardSearchVO);
     List<BoardVO> categoryList = boardDAO.boardCategory();
     //게시글 글 개수
-    int boardCount = boardDAO.boardCount();
+    int boardCount = boardDAO.boardCount(startRow, pageSize, boardSearchVO);
+  
 %>
 <h1>게시판 - 목록 </h1>
 <hr/>
-<form action="/board/search.jsp" method="post">
+<form action="/board/list.jsp" method="post">
 등록일 <input type="date" name="board_date_start"> ~ <input type="date" name="board_date_end">
 <select name="category_num">
+    <option value="0">==선택하세요==</option>
     <%
         for (BoardVO boardVO : categoryList){
     %>
@@ -64,9 +98,6 @@
     <%
         for (BoardVO boardVO : list) {
     %>
-
-
-
     <tr>
         <td><%=boardVO.getCategory_name() %></td>
         <td><%if(boardVO.getBoard_file_state() == 1) { %>

@@ -15,7 +15,22 @@ public class BoardDAO {
     private final String password = "admin1234";
 
     //게시글 목록
-    public List<BoardVO> boardList(int startRow, int pageSize) {
+    public List<BoardVO> boardList(int startRow, int pageSize, BoardSearchVO boardSearchVO) {
+
+        String startDate = boardSearchVO.getStartDate();
+        String endDate = boardSearchVO.getEndDate();
+        int categoryNum = boardSearchVO.getCategoryNum();
+        String searchText = boardSearchVO.getSearchText();
+
+        System.out.println(startDate);
+
+        System.out.println(endDate);
+
+        System.out.println(categoryNum);
+
+        System.out.println(searchText);
+
+
         List<BoardVO> list = new ArrayList<>();
         Connection connection = null;
         PreparedStatement statement = null;
@@ -24,12 +39,48 @@ public class BoardDAO {
         String sql = "SELECT BOARD_NUM, BOARD_TITLE, BOARD_WRITER, BOARD_CONTENT, BOARD_DATE, BOARD_UPDATE, BOARD_COUNT, CATEGORY_NAME, BOARD_FILE_STATE \n" +
                 "FROM board b \n" +
                 "JOIN category c on c.category_num = b.category_num \n" +
-                "ORDER BY board_num DESC, board_num LIMIT ?, ? \n";
+                "WHERE 1=1";
+        String betweenDate = " AND board_date BETWEEN ? AND ?";
+        String category = " AND c.category_num = ?";
+        String search = " AND BOARD_TITLE LIKE ? and BOARD_WRITER LIKE ? and BOARD_CONTENT LIKE ? ";
+        String sqlLimit = " ORDER BY board_num DESC, board_num LIMIT ?, ? \n";
+        String sqlReuslt = "";
+        if (categoryNum == 0 && searchText.equals("")){
+            sqlReuslt = sql + betweenDate + sqlLimit;
+            System.out.println("1.  " + sqlReuslt);
+        } else if(categoryNum != 0 && searchText.equals("")){
+            sqlReuslt = sql + betweenDate + category + sqlLimit;
+            System.out.println("2 .  " + sqlReuslt);
+        } else {
+            sqlReuslt = sql + betweenDate + category + search + sqlLimit;
+            System.out.println("3.  " + sqlReuslt);
+        }
+
         try {
             connection = this.getConnection();
-            statement = connection.prepareStatement(sql);
-            statement.setInt(1, startRow - 1);
-            statement.setInt(2, pageSize);
+            statement = connection.prepareStatement(sqlReuslt);
+            System.out.println(statement.toString());
+            if(categoryNum == 0 && searchText.equals("")){
+                statement.setString(1, startDate);
+                statement.setString(2, endDate);
+                statement.setInt(3, startRow - 1);
+                statement.setInt(4, pageSize);
+            } else if(categoryNum != 0 && searchText.equals("")) {
+                statement.setString(1, startDate);
+                statement.setString(2, endDate);
+                statement.setInt(3, categoryNum);
+                statement.setInt(4, startRow - 1);
+                statement.setInt(5, pageSize);
+            } else {
+                statement.setString(1, startDate);
+                statement.setString(2, endDate);
+                statement.setInt(3, categoryNum);
+                statement.setString(4, "%"+searchText+"%");
+                statement.setString(5, "%"+searchText+"%");
+                statement.setString(6, "%"+searchText+"%");
+                statement.setInt(7, startRow - 1);
+                statement.setInt(8, pageSize);
+            }
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 BoardVO boardVO = new BoardVO();
@@ -62,15 +113,61 @@ public class BoardDAO {
     }
 
     //게시글 총 건수
-    public int boardCount() {
+    public int boardCount(int startRow, int pageSize, BoardSearchVO boardSearchVO) {
+
+        String startDate = boardSearchVO.getStartDate();
+        String endDate = boardSearchVO.getEndDate();
+        int categoryNum = boardSearchVO.getCategoryNum();
+        String searchText = boardSearchVO.getSearchText();
+
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        String sql = "SELECT count(*) as Board_search_count FROM Board";
+
+
+        //sql 문
+        String sql = "SELECT count(*) as Board_search_count \n" +
+                "FROM board b \n" +
+                "JOIN category c on c.category_num = b.category_num \n" +
+                "WHERE 1=1";
+        String betweenDate = " AND board_date BETWEEN ? AND ?";
+        String category = " AND c.category_num = ?";
+        String search = " AND BOARD_TITLE LIKE ? and BOARD_WRITER LIKE ? and BOARD_CONTENT LIKE ?";
+        String sqlLimit = " ORDER BY board_num DESC, board_num LIMIT ?, ? \n";
+        String sqlReuslt = "";
+        if (categoryNum == 0 && searchText.equals("")){
+            sqlReuslt = sql + betweenDate + sqlLimit;
+        } else if(categoryNum != 0 && searchText.equals("")){
+            sqlReuslt = sql + betweenDate + category + sqlLimit;
+        } else {
+            sqlReuslt = sql + betweenDate + category + search + sqlLimit;
+        }
+
         int boardSearchCount = 0;
         try {
             connection = this.getConnection();
-            statement = connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sqlReuslt);
+            if(categoryNum == 0 && searchText.equals("")){
+                statement.setString(1, startDate);
+                statement.setString(2, endDate);
+                statement.setInt(3, startRow - 1);
+                statement.setInt(4, pageSize);
+            } else if(categoryNum != 0 && searchText.equals("")) {
+                statement.setString(1, startDate);
+                statement.setString(2, endDate);
+                statement.setInt(3, categoryNum);
+                statement.setInt(4, startRow - 1);
+                statement.setInt(5, pageSize);
+            } else {
+                statement.setString(1, startDate);
+                statement.setString(2, endDate);
+                statement.setInt(3, categoryNum);
+                statement.setString(4, "%"+searchText+"%");
+                statement.setString(5, "%"+searchText+"%");
+                statement.setString(6, "%"+searchText+"%");
+                statement.setInt(7, startRow - 1);
+                statement.setInt(8, pageSize);
+            }
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 boardSearchCount = resultSet.getInt("Board_search_count");
