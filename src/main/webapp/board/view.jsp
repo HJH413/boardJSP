@@ -73,10 +73,10 @@
     <br/>
     <%=comments.getComment_content()%>
     <hr/>
-    총 댓글 : <%=boardCommentsCount %> 개
     <%
         }
     %>
+총 댓글 : <%=boardCommentsCount %> 개
 <% } %>
 
 <%--<div id="page_control">

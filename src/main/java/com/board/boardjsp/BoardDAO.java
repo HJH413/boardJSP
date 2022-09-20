@@ -329,21 +329,24 @@ public class BoardDAO {
         }
         return boardCommentsCount;
     }
-    //글수정
 
-    //글삭제
-    public int boardDelete(int boardNum){
-
+    //삭제전 비밀번호 채크
+    public int boardPasswordCheck(int boardNum, String boardPassword){
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
 
-        String sql = "";
-
+        String sql = "SELECT count(*) as passCheck FROM board WHERE board_num = ? and board_password = ?";
+        int passCheck = 0;
         try {
             connection = this.getConnection();
             statement = connection.prepareStatement(sql);
-
+            statement.setInt(1, boardNum);
+            statement.setString(2, boardPassword);
+            resultSet = statement.executeQuery();
+            while(resultSet.next()){
+                passCheck = resultSet.getInt("passCheck");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -351,8 +354,29 @@ public class BoardDAO {
         }
 
 
-        return 1;
+        return passCheck;
     }
+
+    //글삭제
+    public int boardDelete(int boardNum){
+        Connection connection = null;
+        PreparedStatement statement = null;
+        String sql = "DELETE FROM board WHERE board_num = ?";
+        int num = 0;
+        try {
+            connection = this.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1,boardNum);
+            num = statement.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            this.close(connection, statement, null);
+        }
+        return num;
+    }
+    //글수정
 
     //커넥션
     private Connection getConnection() {
