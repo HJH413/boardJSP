@@ -8,12 +8,15 @@
     int boardNum = Integer.parseInt(request.getParameter("board_num"));
     String boardPassword = request.getParameter("board_password");
     BoardDAO boardDAO = new BoardDAO();
-    int check = boardDAO.boardPasswordCheck(boardNum, boardPassword);
+    int check = boardDAO.boardPasswordCheck(boardNum, boardPassword); //삭제 실패시 0 성공하면 1
+    System.out.println(check);
     if(check == 0){ %>
     <script>
         alert("비밀번호 불일치");
         location.href= "/board/view.jsp?boardNum="+<%=boardNum %>;
     </script>
-    <% }  else { boardDAO.boardDelete(boardNum);}
+    <% } else {
+        boardDAO.boardDelete(boardNum);
+        System.out.println(check +" passCheckNum@@#@#");
         response.sendRedirect("/board/list.jsp");
-    %>
+    } %>

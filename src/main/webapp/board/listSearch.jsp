@@ -12,23 +12,50 @@
 </head>
 <body>
 <%
-    // 한 페이지에 출력될 글 수
-    int pageSize = 10;
-    //현 페이지 정보 설정
-    String pagNum = request.getParameter("pageNum");
-    if(pagNum == null) {
-        pagNum = "1";
-    }
-    //첫 행번호 계산
-    int currentPage = Integer.parseInt(pagNum);
-    int startRow = (currentPage-1) * pageSize + 1;
-
     BoardDAO boardDAO = new BoardDAO();
+    BoardSearchVO boardSearchVO = new BoardSearchVO();
 
-    List<BoardVO> list = boardDAO.boardList(startRow, pageSize);
+    String startDate = "";
+    String endDate = "";
+    int categoryNum = 0;
+    String searchText = "";
+
+    if (request.getParameter("board_date_start").equals("")){
+        System.out.println("1");
+        startDate = "1999-01-01";
+    } else {
+        System.out.println("2");
+        startDate = request.getParameter("board_date_start");
+    }
+    if (request.getParameter("board_date_end").equals("")){
+        System.out.println("1");
+        endDate = "2999-01-01";
+    } else {
+        endDate = request.getParameter("board_date_end");
+    }
+
+    categoryNum = Integer.parseInt(request.getParameter("category_num"));
+
+    if (request.getParameter("board_search_text").equals("")){
+        System.out.println("1");
+        searchText = "";
+    } else {
+        System.out.println("2");
+        searchText = request.getParameter("board_search_text");
+    }
+    System.out.println(startDate);
+    System.out.println(endDate);
+    System.out.println(categoryNum);
+    System.out.println(searchText);
+    boardSearchVO.setStartDate(startDate);
+    boardSearchVO.setEndDate(endDate);
+    boardSearchVO.setCategoryNum(categoryNum);
+    boardSearchVO.setSearchText(searchText);
+
+    List<BoardVO> list = boardDAO.boardSearchList(boardSearchVO);
     List<BoardVO> categoryList = boardDAO.boardCategory();
     //게시글 글 개수
-    int boardCount = boardDAO.boardCount();
+    //int boardCount = boardDAO.boardCount();
   
 %>
 <h1>게시판 - 목록 </h1>
@@ -49,7 +76,7 @@
 <input type="submit" value="검색">
 </form>
 <hr/>
-<h3>총 <%= boardCount %>건</h3>
+<%--<h3>총 <%= boardCount %>건</h3>--%>
 <br/>
 <table border="1">
     <thead>
@@ -86,38 +113,6 @@
         }
     %>
 </table>
-<div id="page_control">
-    <%
-        if(boardCount != 0) {
-            // 페이징 처리
-            // 전체 페이지수 계산
-            int pageCount = boardCount / pageSize + (boardCount%pageSize==0?0:1);
-
-            // 한 페이지에 보여줄 페이지 블록
-            int pageBlock = 10;
-
-            // 한 페이지에 보여줄 페이지 블록 시작번호 계산
-            int startPage = ((currentPage-1)/pageBlock)*pageBlock+1;
-
-            // 한 페이지에 보여줄 페이지 블럭 끝 번호 계산
-            int endPage = startPage + pageBlock -1;
-            if (endPage > pageCount) {
-                endPage = pageCount;
-            }
-    %>
-        <a href="/board/list.jsp?pageNum=<%=startPage%>">처음으로</a>
-        <% if(startPage>pageBlock) {%>
-            <a href="/board/list.jsp?pageNum=<%=startPage-pageBlock%>">이전</a>
-        <% }%>
-        <% for(int i = startPage; i<=endPage; i++) { %>
-            <a href="/board/list.jsp?pageNum=<%=i%>"><%=i%></a>
-        <% }%>
-        <% if(endPage<pageCount) {%>
-            <a href="/board/list.jsp?pageNum=<%=startPage+pageBlock%>">다음</a>
-        <% }%>
-            <a href="/board/list.jsp?pageNum=<%=endPage%>">마지막</a>
-    <%} // eno of if %>
-</div>
 <a href="/board/write.jsp">글작성</a>
 </body>
 </html>
