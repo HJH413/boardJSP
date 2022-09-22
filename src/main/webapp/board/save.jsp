@@ -8,8 +8,8 @@
 <%@ page import="com.board.boardjsp.*" %>
 <%@ page import="java.io.File" %>
 <%
-    String uploadPath = "C:/boardFile";		// 업로드 경로
-    int maxFileSize = 1024 * 1024 * 20;	// 업로드 제한 용량 = 20MB
+    String uploadPath = "C:\\boardStudy\\boardJSP\\src\\main\\webapp\\file";		// 업로드 경로
+    int maxFileSize = 1024 * 1024 * 2000;	// 업로드 제한 용량 = 20MB
     String encoding = "utf-8";			// 인코딩
 
     MultipartRequest multi = new MultipartRequest(

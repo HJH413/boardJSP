@@ -91,7 +91,7 @@ public class BoardDAO {
                 "WHERE 1=1";
         String betweenDate = " AND board_date BETWEEN ? AND ?";
         String category = " AND c.category_num = ?";
-        String search = " AND BOARD_TITLE LIKE ? and BOARD_WRITER LIKE ? and BOARD_CONTENT LIKE ? ";
+        String search = " AND (BOARD_TITLE LIKE ? or BOARD_WRITER LIKE ? or BOARD_CONTENT LIKE ?) ";
         String sqlLimit = " ORDER BY board_num DESC";
         String sqlReuslt = "";
         if (categoryNum == 0 && searchText.equals("")){
@@ -343,7 +343,7 @@ public class BoardDAO {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
 
-        String sql = "SELECT file_change_name FROM file WHERE BOARD_NUM = ?";
+        String sql = "SELECT file_change_name, board_num FROM file WHERE BOARD_NUM = ?";
 
         try {
             connection = this.getConnection();
@@ -466,23 +466,39 @@ public class BoardDAO {
     }
 
     //글삭제
-    public int boardDelete(int boardNum){
+    public void boardDelete(int boardNum){
         Connection connection = null;
         PreparedStatement statement = null;
         String sql = "DELETE FROM board WHERE board_num = ?";
-        int num = 0;
         try {
             connection = this.getConnection();
             statement = connection.prepareStatement(sql);
             statement.setInt(1,boardNum);
-            num = statement.executeUpdate();
+            statement.executeUpdate();
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             this.close(connection, statement, null);
         }
-        return num;
+    }
+    //파일 삭제
+    public void boardFileDelete(int boardNum, String boardFileName){
+        Connection connection = null;
+        PreparedStatement statement = null;
+        String sql = "DELETE FROM file WHERE board_num = ? and file_change_name = ?";
+        try {
+            connection = this.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1,boardNum);
+            statement.setString(2,boardFileName);
+            statement.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            this.close(connection, statement, null);
+        }
     }
     //글수정
     public void boardModify(BoardVO boardVO){

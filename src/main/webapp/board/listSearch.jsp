@@ -12,6 +12,7 @@
 </head>
 <body>
 <%
+    request.setCharacterEncoding("UTF-8");
     BoardDAO boardDAO = new BoardDAO();
     BoardSearchVO boardSearchVO = new BoardSearchVO();
 

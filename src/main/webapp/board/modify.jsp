@@ -8,7 +8,7 @@
     int boardNum = Integer.parseInt(request.getParameter("boardNum"));
     BoardDAO boardDAO = new BoardDAO();
     BoardVO boardVO = new BoardVO();
-    List<BoardVO> categoryList = boardDAO.boardCategory();
+    List<BoardVO> filelist = boardDAO.fileList(boardNum);
 
     boardVO = boardDAO.boardRead(boardNum);
 
@@ -48,11 +48,18 @@
             newCell2.innerHTML = '<input type="file" name="board_file' + i + '">';
             i += 1
         }
+
+        const board_file_remove = (fileName, boardNum) => {
+            const yseNo = confirm("삭제하시겠습니까?");
+            if(yseNo){
+                location.href= "/board/deleteFilePage.jsp?boardNum="+boardNum+"&fileName="+fileName;
+            }
+        }
     </script>
 </head>
 <body>
 <h1> 게시판 - 수정</h1>
-<form id="write_from" action="/board/modifySave.jsp" method="post">
+<form id="write_from" action="/board/modifySave.jsp" method="post" enctype="multipart/form-data">
     <input type="hidden" name="board_num" value="<%=boardNum%>"/>
     <table width="100%" style="border : none;" id="board_table">
         <tr>
@@ -105,12 +112,23 @@
                 <textarea rows="10" cols="150" id="board_content" name="board_content" minlength="4" maxlength="1999" required><%=boardContent%></textarea>
             </td>
         </tr>
+        <%
+            for (BoardVO boardVO1 : filelist){
+        %>
+        <tr id="<%=boardVO1.getFile_name()%>">
+            <td class="td_name">첨부파일</td>
+            <td class="td_content">
+                 <a href="../file/<%=boardVO1.getFile_name()%>" download=""><%=boardVO1.getFile_name()%></a><input name="<%=boardVO1.getFile_name()%>" type="button" onclick='board_file_remove("<%=boardVO1.getFile_name()%>", "<%=boardNum%>")' value="삭제">
+            </td>
+        </tr>
+        <%
+            }
+        %>
         <%--파일 업로드시 필수 사용 enctype="multipart/form-data"--%>
         <tr>
             <td class="td_name">파일 첨부</td>
             <td class="td_content"><input type="file" name="board_file1"></td>
         </tr>
-
     </table>
     <input type="button" id="board_file_extend" name="board_file_extend" onclick="board_file_add()" value="파일 추가 첨부 버튼">
     <input type="submit" id="save" name="save" onclick="board_password_check()" value="저장">

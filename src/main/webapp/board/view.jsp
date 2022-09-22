@@ -47,7 +47,8 @@
 <%
     for (BoardVO boardVO1 : filelist){
 %>
-<%=boardVO1.getFile_name()%><br/>
+<a href="../file/<%=boardVO1.getFile_name()%>" download=""><%=boardVO1.getFile_name()%></a><br/>
+
 <%
     }
 %>
